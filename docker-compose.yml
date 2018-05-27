@@ -15,7 +15,7 @@ services:
       - /home/pi/svxlink-docker/config/svxlink.conf:/etc/svxlink/svxlink.conf:ro
       - /home/pi/svxlink-docker/config/remotetrx.conf:/etc/svxlink/remotetrx.conf:ro
       - /home/pi/svxlink-docker/config/ModuleEchoLink.conf:/etc/svxlink/svxlink.d/ModuleEchoLink.conf:ro
-      - /home/pi/svxlink-docker/config/sounds:/usr/share/svxlink/sounds:ro
+ #     - /home/pi/svxlink-docker/config/sounds:/usr/share/svxlink/sounds:ro
       - /dev/snd:/dev/snd
     devices:
       - /dev/snd:/dev/snd
