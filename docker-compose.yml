@@ -1,0 +1,23 @@
+version: '3'
+services:
+  svxlink:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+    container_name: svxlink
+    ports:
+      - 5198:5198/udp
+      - 5199:5199/udp
+      - 5200:5200/tcp
+    volumes:
+      - /home/pi/svxlink-docker/config/svxlink.conf:/etc/svxlink/svxlink.conf:ro
+      - /home/pi/svxlink-docker/config/remotetrx.conf:/etc/svxlink/remotetrx.conf:ro
+      - /home/pi/svxlink-docker/config/ModuleEchoLink.conf:/etc/svxlink/svxlink.d/ModuleEchoLink.conf:ro
+      - /home/pi/svxlink-docker/config/sounds:/usr/share/svxlink/sounds:ro
+      - /dev/snd:/dev/snd
+    devices:
+      - /dev/snd:/dev/snd
+      - /dev/gpiomem:/dev/gpiomem
+    restart: always
