@@ -58,4 +58,6 @@ EXPOSE 5199
 EXPOSE 5200
 
 ADD entrypoint.sh /
-ENTRYPOINT ["/entrypoint.sh"]
+#ENTRYPOINT ["/entrypoint.sh"]
+
+CMD screen -dmS "svxlink" svxlink && screen -x svxlink
