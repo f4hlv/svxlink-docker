@@ -21,7 +21,7 @@ $ sudo apt-get -y install python-setuptools
 $ sudo easy_install pip && sudo pip install docker-compose
 ```
 
-# Build and Run direwolf
+# Build and Run svxlink
 ```console
 $ git clone https://github.com/f4hlv/svxlink-docker.git
 $ cd svxlink-docker
