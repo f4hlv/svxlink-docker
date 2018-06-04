@@ -33,7 +33,10 @@ $ docker-compose up -d
 ## Volume
 - `./svxlink.conf:/etc/svxlink/svxlink.conf` Path to the svxlink.conf File
 - `./config/ModuleEchoLink.conf:/etc/svxlink/svxlink.d/ModuleEchoLink.conf` Path to the ModuleEchoLink.conf File
-
+## Run console svxlink
+```console
+$ docker exec -it svxlink screen -x svxlink
+```
 # Update
 ```console
 $ docker-compose build --no-cache
