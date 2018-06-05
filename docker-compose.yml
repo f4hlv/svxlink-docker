@@ -11,12 +11,16 @@ services:
       - 5198:5198/udp
       - 5199:5199/udp
       - 5200:5200/tcp
+#    environment:
+#      - GIT_BRANCH=master # To build another branch than master
+#      - NUM_CORES=8 # To use more than one CPU core when compiling
+#      - GIT_URL=username@your.repo:/path/to/svxlink.git # To use a specific git repositoty instead of the default one
     volumes:
       - ./config/svxlink.conf:/etc/svxlink/svxlink.conf:ro
       - ./config/ModuleEchoLink.conf:/etc/svxlink/svxlink.d/ModuleEchoLink.conf:ro
-#      - ./config/remotetrx.conf:/etc/svxlink/remotetrx.conf:ro
 #      - ./config/sounds:/usr/share/svxlink/sounds:ro
+#      - ${HOME}/.gitconfig:/home/svxlink/.gitconfig:ro # To import your git config add (mileage may vary)
     devices:
       - /dev/snd:/dev/snd
       - /dev/gpiomem:/dev/gpiomem
-    restart: always
+    restart: unless-stopped
