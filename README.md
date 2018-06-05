@@ -37,7 +37,7 @@ $ docker-compose up -d
 ```console
 $ docker exec -it svxlink screen -x svxlink
 ```
-# Update
+# Update image SVXLINK
 ```console
 $ docker-compose build --no-cache
 $ docker-compose up -d
