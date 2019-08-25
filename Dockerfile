@@ -51,6 +51,7 @@ ENV GIT_URL=https://github.com/sm0svx/svxlink.git \
 RUN useradd -s /bin/bash svxlink
 ADD build-svxlink.sh /home/svxlink/
 RUN chown -R svxlink.svxlink /home/svxlink
+RUN /home/svxlink/build-svxlink.sh
 
 EXPOSE 5198
 EXPOSE 5199
