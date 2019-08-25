@@ -27,9 +27,9 @@ MAINTAINER Tobias Blomberg <sm0svx@ssa.se>
 # Install required packages and set up the svxlink user
 RUN apt-get update && \
     apt-get -y install git cmake g++ make libsigc++-2.0-dev libgsm1-dev \
-                       libpopt-dev tcl8.5-dev libgcrypt11-dev libspeex-dev \
+                       libpopt-dev tcl8.6-dev libgcrypt20-dev libspeex-dev \
                        libasound2-dev alsa-utils vorbis-tools libqt4-dev \
-                       libopus-dev librtlsdr-dev curl sudo screen
+                       libopus-dev librtlsdr-dev libcurl4-openssl-dev curl sudo screen
 #RUN apt-get -y install groff doxygen
 
 # Install svxlink audio files
@@ -51,7 +51,6 @@ ENV GIT_URL=https://github.com/sm0svx/svxlink.git \
 RUN useradd -s /bin/bash svxlink
 ADD build-svxlink.sh /home/svxlink/
 RUN chown -R svxlink.svxlink /home/svxlink
-RUN /home/svxlink/build-svxlink.sh
 
 EXPOSE 5198
 EXPOSE 5199
