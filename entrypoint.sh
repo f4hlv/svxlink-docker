@@ -2,7 +2,6 @@
 # set -e
 
 VERT="\\033[32m"
-NORMAL="\\033[39m"
 ROUGE="\\033[31m"
 JAUNE="\\033[33m"
 NC='\033[0m' # No Color
@@ -18,24 +17,20 @@ while [ $current_attempt -le $max_attempts ]; do
         /app/build_svxlink.sh
 
         echo "${JAUNE}Tentative $current_attempt : Installation de Spotnik.${NC}"
-        # /app/build_spotnik.sh
+        /app/build_spotnik.sh
 
         current_attempt=$((current_attempt + 1))
-        sleep 10  # Pause de 10 secondes entre les tentatives
+        sleep 5  # Pause de 5 secondes entre les tentatives
     fi
 
 
     if [ -z "$1" ]; then
         # Lancement de svxlink par défaut
-        echo "Lancement de svxlink"
-        # svxlink --config /etc/svxlink/svxlink.conf
-        # remotetrx
-        /etc/spotnik/restart
-        # sleep 5
-        # /etc/spotnik/view_svx
+        echo "${VERT}Lancement de svxlink${NC}"
+        svxlink --config /etc/svxlink/svxlink.conf
     else
-        # Des arguments ont été passés, exécuter la commande avec les arguments
-        echo "Lancement de la commande: $@"
+        # Lancement d'une commande spécifique (ex: remotetrx, svxlinkreflector, ...)
+        echo "${VERT}Lancement de la commande: $@${NC}"
         exec "$@"
     fi
 

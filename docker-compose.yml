@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    # command: ["svxlink", "remotetrx", "svxlinkreflector"] #Commandes personnalisées (si besoin)
     tty: true
     stdin_open: true
     container_name: svxlink
