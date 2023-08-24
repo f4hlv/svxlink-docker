@@ -1,0 +1,8 @@
+!README.md
+*.md
+.cache
+.git
+.gitignore
+LICENSE
+config
+svxlink

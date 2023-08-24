@@ -1,32 +1,45 @@
-#!/bin/bash
+#!/bin/sh
+# set -e
 
-# Force new UID if specified
-#if [ -n "$SVXLINK_UID" ]; then
-#  usermod -u $SVXLINK_UID svxlink
-#fi
+VERT="\\033[32m"
+NORMAL="\\033[39m"
+ROUGE="\\033[31m"
+JAUNE="\\033[33m"
+NC='\033[0m' # No Color
 
-# Force new GID if specified
-#if [ -n "$SVXLINK_GID" ]; then
-#  usermod -g $SVXLINK_GID svxlink
-#  find /home/svxlink ! -gid $SVXLINK_GID -exec chgrp $SVXLINK_GID {} \;
-#fi
 
-# Create the hostaudio group if GID is specified
-if [ -n "$HOSTAUDIO_GID" ]; then
-  groupadd -g $HOSTAUDIO_GID hostaudio
-  usermod -G $HOSTAUDIO_GID svxlink
-fi
+max_attempts=3
+current_attempt=1
 
-# Set up the sudo command line
-SUDO_CMD="sudo -u svxlink "
-SUDO_CMD+="PATH=$PATH:/usr/lib64/qt4/bin "
-SUDO_CMD+="GIT_URL=$GIT_URL "
-SUDO_CMD+="GIT_BRANCH=$GIT_BRANCH "
-SUDO_CMD+="NUM_CORES=$NUM_CORES "
+while [ $current_attempt -le $max_attempts ]; do
+    # Vérifiez si l'exécutable svxlink existe
+    if [ ! -e "/etc/svxlink/svxlink.conf" ] || [ ! -x "$(command -v svxlink)" ]; then
+        echo "${JAUNE}Tentative $current_attempt : Installation de SvxLink.${NC}"
+        /app/build_svxlink.sh
 
-# If an argument is specified, run it as a command or else just start a shell
-if [ $# -gt 0 ]; then
-  exec $SUDO_CMD "$@"
-else
-  exec $SUDO_CMD -i
-fi
+        echo "${JAUNE}Tentative $current_attempt : Installation de Spotnik.${NC}"
+        # /app/build_spotnik.sh
+
+        current_attempt=$((current_attempt + 1))
+        sleep 10  # Pause de 10 secondes entre les tentatives
+    fi
+
+
+    if [ -z "$1" ]; then
+        # Lancement de svxlink par défaut
+        echo "Lancement de svxlink"
+        # svxlink --config /etc/svxlink/svxlink.conf
+        # remotetrx
+        /etc/spotnik/restart
+        # sleep 5
+        # /etc/spotnik/view_svx
+    else
+        # Des arguments ont été passés, exécuter la commande avec les arguments
+        echo "Lancement de la commande: $@"
+        exec "$@"
+    fi
+
+done
+echo "${ROUGE}L'installation de SvxLink a rencontré un problème après $max_attempts tentatives.${NC}"
+
+
