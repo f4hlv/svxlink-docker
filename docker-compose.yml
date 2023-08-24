@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # command: ["svxlink", "remotetrx", "svxlinkreflector"] #Commandes personnalisées (si besoin)
+    # command: ["svxlink", "remotetrx", "svxreflector"] # Commandes personnalisées (si besoin)
     tty: true
     stdin_open: true
     container_name: svxlink
@@ -26,8 +26,8 @@ services:
     environment:
       # - HOSTAUDIO_GID=$(stat -c "%g" /dev/snd/timer)
       - GIT_URL=https://github.com/sm0svx/svxlink.git
-      # - GIT_BRANCH=master
-      - GIT_BRANCH=19.09.2
+      - GIT_BRANCH=master
+      # - GIT_BRANCH=19.09.2
       - NUM_CORES=4
     devices:
       - /dev/snd:/dev/snd # Audio
