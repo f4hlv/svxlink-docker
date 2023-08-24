@@ -9,22 +9,6 @@ $ curl -fsSL get.docker.com -o get-docker.sh
 $ sudo sh get-docker.sh
 ```
 
-# Installation de docker-compose **(N'est plus nécessaire)**
-
-- (Debian)
-
-```sh
-$ sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-$ chmod +x /usr/local/bin/docker-compose
-```
-
-* (Raspberry)
-
-```sh
-$ sudo apt-get -y install python-setuptools
-$ sudo easy_install pip && sudo pip install docker-compose
-```
-
 # Build and Run svxlink
 ## Importer votre configuration
 
@@ -40,7 +24,7 @@ $ cd svxlink-docker
 Edit docker-compose.yml and run
 
 ```sh
-$ docker-compose up -d
+$ docker compose up -d
 ```
 ## Volume
 ## Fichier spécifique
@@ -57,10 +41,9 @@ $ docker compose logs -f --tail=500
 ```
 
 # Mise à jour de l'image svxlink
-
 ```sh
-$ docker-compose build --no-cache
-$ docker-compose up -d
+$ docker compose build --no-cache
+$ docker compose up -d
 ```
 
 # docker-compose
