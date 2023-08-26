@@ -1,4 +1,5 @@
-FROM debian:stable-slim
+# FROM debian:stable-slim
+FROM arm32v7/debian:bullseye
 
 LABEL maintainer="Vincent F4HLV <vincent@f4hlv.fr>" \
       description="Docker image for SvxLink"
@@ -17,7 +18,6 @@ RUN apt-get update && apt-get install -y \
 # Create user svxlink
 RUN groupadd svxlink \
     && useradd -r -g daemon -G svxlink -c "SvxLink" svxlink
-# RUN useradd -s /bin/bash svxlink
 
 ENV GIT_URL=https://github.com/sm0svx/svxlink.git \
     # GIT_BRANCH=master \
