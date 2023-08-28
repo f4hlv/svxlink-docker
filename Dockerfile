@@ -1,5 +1,5 @@
 # FROM debian:stable-slim
-FROM arm32v7/debian:bullseye
+FROM debian:bullseye
 
 LABEL maintainer="Vincent F4HLV <vincent@f4hlv.fr>" \
       description="Docker image for SvxLink"
