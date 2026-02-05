@@ -64,6 +64,18 @@ cd svxlink-docker
 
 Edit `docker-compose.yml` to match your needs, then start the container:
 
+### Retrieve Original SvxLink Files
+
+If you want to extract the original SvxLink configuration and data files from the container:
+
+```sh
+mkdir -p config/etc config/usr/share
+
+docker compose cp svxlink:/etc/svxlink config/etc/
+docker compose cp svxlink:/usr/share/svxlink config/usr/share/
+```
+
+This is useful as a starting point for customization.
 ```sh
 docker compose up -d
 ```
@@ -112,7 +124,7 @@ Example for `svxlink.conf`:
 
 ```yaml
 ./config/etc/svxlink:/etc/svxlink
-./config/usr/svxlink:/usr/share/svxlink
+./config/usr/share/svxlink:/usr/share/svxlink
 ```
 
 ---
@@ -138,21 +150,6 @@ SVXLINK_CONF=/etc/svxlink/svxlink.conf
 REMOTETRX_CONF=/etc/svxlink/remotetrx.conf
 SVXREFLECTOR_CONF=/etc/svxlink/svxreflector.conf
 ```
-
----
-
-## Retrieve Original SvxLink Files
-
-If you want to extract the original SvxLink configuration and data files from the container:
-
-```sh
-mkdir -p config_example/etc config_example/usr/share
-
-docker compose cp svxlink:/etc/svxlink config_example/etc/
-docker compose cp svxlink:/usr/share/svxlink config_example/usr/share/
-```
-
-This is useful as a starting point for customization.
 
 ---
 
