@@ -1,48 +1,42 @@
-# FROM debian:stable-slim
-FROM debian:bullseye
+FROM debian:trixie-slim
 
-LABEL maintainer="Vincent F4HLV <vincent@f4hlv.fr>" \
-      description="Docker image for SvxLink"
+ENV DEBIAN_FRONTEND=noninteractive
 
-
-# Install required packages and set up the svxlink user
-RUN apt-get update && apt-get install -y \
-    git cmake g++ make libjsoncpp-dev libsigc++-2.0-dev libgsm1-dev \
-    libpopt-dev tcl8.6-dev libgcrypt20-dev libspeex-dev \
-    libasound2-dev alsa-utils vorbis-tools \
-    libopus-dev librtlsdr-dev libcurl4-openssl-dev curl wget cron mc nano \
-    # groff doxygen \
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends \
+        git cmake g++ make doxygen groff curl sudo \
+        libsigc++-2.0-dev libgsm1-dev libpopt-dev tcl8.6-dev \
+        libgcrypt20-dev libspeex-dev libasound2-dev alsa-utils \
+        vorbis-tools qtbase5-dev qttools5-dev \
+        qttools5-dev-tools libopus-dev librtlsdr-dev \
+        libjsoncpp-dev libcurl4-openssl-dev libgpiod-dev \
+        libogg-dev ladspa-sdk libssl-dev \
+        ca-certificates openssl \
     && rm -rf /var/lib/apt/lists/*
 
-
-# Create user svxlink
-RUN groupadd svxlink \
-    && useradd -r -g daemon -G svxlink -c "SvxLink" svxlink
-
 ENV GIT_URL=https://github.com/sm0svx/svxlink.git \
-    # GIT_BRANCH=master \
-    GIT_BRANCH=19.09.2 \
+    GIT_BRANCH=master \
     NUM_CORES=4
 
-# Set workdir to compile the source code
-WORKDIR /root
+# Compilation de SVXLink
+COPY build-svxlink.sh /usr/local/bin/build-svxlink.sh
+RUN chmod +x /usr/local/bin/build-svxlink.sh
 
-RUN adduser svxlink dialout
+# Crée un répertoire de build
+WORKDIR /build
+RUN /usr/local/bin/build-svxlink.sh
 
-VOLUME /etc/spotnik
-VOLUME /etc/svxlink
-VOLUME /usr/share/svxlink
+# Dossiers usuels
+RUN mkdir -p /etc/svxlink /var/log/svxlink /var/lib/svxlink && \
+    useradd -r -u 1000 -g audio -G audio,dialout -m -d /home/svx svx || true
 
-COPY build_svxlink.sh /app/build_svxlink.sh
-COPY build_spotnik.sh /app/build_spotnik.sh
+ENV SVXLINK_CONF=/etc/svxlink/svxlink.conf \
+    SVXLINK_LOG=/var/log/svxlink \
+    SVXLINK_RUN_ARGS=""
 
-RUN /app/build_svxlink.sh
+# Entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-EXPOSE 5198
-EXPOSE 5199
-EXPOSE 5200
-EXPOSE 5550
-
-COPY entrypoint.sh /app/entrypoint.sh
-
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
+# CMD ["svxlink"]

@@ -1,84 +1,177 @@
-# SVXLINK #
+# SVXLink Docker Setup
 
-SvxLink is a project that develops software targeting the ham radio community. It started out as an EchoLink application for Linux back in 2003 but has now evolved to be something much more advanced.
+SvxLink is an open-source software suite designed for the **amateur radio (ham radio)** community.  
+Originally started in 2003 as an EchoLink application for Linux, SvxLink has evolved into a powerful and flexible system supporting:
 
-# Installation de Docker
+- FM repeaters  
+- Remote transceivers  
+- Reflectors  
+- Voice services and logic scripting  
+
+This repository provides a **Docker-based setup** to simplify building, configuring, and running SvxLink in a clean, reproducible environment.
+
+✅ Compatible with **Debian Trixie**  
+✅ Supports **GPIOD-based GPIO management**
+
+---
+
+## Features
+
+- Easy deployment using Docker and Docker Compose  
+- Run SvxLink, RemoteTrx, and/or SvxReflector from a single image  
+- Flexible configuration using volumes  
+- Environment variables to control startup behavior  
+- Ideal for Raspberry Pi, mini PCs, or servers  
+
+---
+
+## Prerequisites
+
+- Linux host (Debian recommended)
+- Docker
+- Docker Compose (v2)
+
+---
+
+## Install Docker
+
+If Docker is not already installed on your system, install it using the official script:
 
 ```sh
-$ curl -fsSL get.docker.com -o get-docker.sh
-$ sudo sh get-docker.sh
+curl -fsSL get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
 ```
 
-# Build and Run svxlink
-## Importer votre configuration
-
-Ajouter le répertoire `/config` ou renommer `config_example`.
-
-## Construction de l'image
-
-```bash
-$ git clone https://github.com/f4hlv/svxlink-docker.git
-$ cd svxlink-docker
-```
-
-Edit docker-compose.yml and run
+Verify installation:
 
 ```sh
-$ docker compose up -d
+docker --version
+docker compose version
 ```
-## Volume
-## Fichier spécifique
-- `./svxlink.conf:/etc/svxlink/svxlink.conf` Exemple pour svxlink.conf
-## Répertoire complet
-- `./config/etc/svxlink:/etc/svxlink`
-- `./config/usr/svxlink:/usr/share/svxlink`
-- `./config/etc/svxlink:/etc/spotnik` (Pour le RRF)
 
-## Console svxlink
-Affiche les 500 dernières lignes
+---
+
+## Build and Run SvxLink
+
+### Clone the Repository
+
 ```sh
-$ docker compose logs -f --tail=500
+git clone https://github.com/f4hlv/svxlink-docker.git
+cd svxlink-docker
 ```
 
-# Mise à jour de l'image svxlink
+### Configure and Start
+
+Edit `docker-compose.yml` to match your needs, then start the container:
+
 ```sh
-$ docker compose build --no-cache
-$ docker compose up -d
+docker compose up -d
 ```
 
-# docker-compose
+---
 
-```yml
-version: '3.2'
-services:
-  svxlink:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    tty: true
-    stdin_open: true
-    container_name: svxlink
-    ports:
-       - 5198:5198/udp  #Echolink
-       - 5199:5199/udp  #Echolink
-       - 5200:5200/tcp  #Echolink
-      #  - 5300:5300    #svxreflector
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ./config/etc/svxlink:/etc/svxlink
-      # - ./config/etc/spotnik:/etc/spotnik
-      - ./config/usr/svxlink:/usr/share/svxlink
-      - /sys/class/gpio/gpio22:/sys/class/gpio/gpio22 # GPIO Raspberry
-      - /sys/class/gpio/gpio24:/sys/class/gpio/gpio24 # GPIO Raspberry
-      - /sys/class/gpio/gpio17:/sys/class/gpio/gpio17 # GPIO Raspberry
-      - /sys/class/gpio/gpio23:/sys/class/gpio/gpio23 # GPIO Raspberry
-      - /dev/snd:/dev/snd
-    environment:
-      - GIT_URL=https://github.com/sm0svx/svxlink.git
-      # - GIT_BRANCH=master # Branche Github
-      - GIT_BRANCH=19.09.2
-      - NUM_CORES=4 # CPU 
-    devices:
-      - /dev/snd:/dev/snd # Audio
-    restart: always
+## View SvxLink Logs
+
+Display the last 500 log lines and follow output in real time:
+
+```sh
+docker compose logs -f --tail=500
 ```
+
+---
+
+## Update the SvxLink Image
+
+To rebuild the image from scratch and restart the container:
+
+```sh
+docker compose build --no-cache
+docker compose up -d
+```
+
+---
+
+## Configuration Volumes
+
+SvxLink configuration is managed using Docker volumes.
+
+### Import Your Own Configuration
+
+Edit or add files inside the `/config` directory.  
+You may override only the files you need or mount full directories.
+
+### Mount a Single Configuration File
+
+Example for `svxlink.conf`:
+
+```yaml
+./svxlink.conf:/etc/svxlink/svxlink.conf
+```
+
+### Mount Full Directories
+
+```yaml
+./config/etc/svxlink:/etc/svxlink
+./config/usr/svxlink:/usr/share/svxlink
+```
+
+---
+
+## Environment Variables
+
+Environment variables allow you to choose which services start and which configuration files are used.
+
+### Enable Services at Startup
+
+Set the value to `1` to enable, `0` to disable:
+
+```env
+START_SVXLINK=1
+START_REMOTETRX=0
+START_SVXREFLECTOR=0
+```
+
+### Select Configuration Files
+
+```env
+SVXLINK_CONF=/etc/svxlink/svxlink.conf
+REMOTETRX_CONF=/etc/svxlink/remotetrx.conf
+SVXREFLECTOR_CONF=/etc/svxlink/svxreflector.conf
+```
+
+---
+
+## Retrieve Original SvxLink Files
+
+If you want to extract the original SvxLink configuration and data files from the container:
+
+```sh
+mkdir -p config_example/etc config_example/usr/share
+
+docker compose cp svxlink:/etc/svxlink config_example/etc/
+docker compose cp svxlink:/usr/share/svxlink config_example/usr/share/
+```
+
+This is useful as a starting point for customization.
+
+---
+
+## Notes
+
+- Make sure your audio devices and GPIO access are properly configured on the host
+- Running on Raspberry Pi may require additional permissions (`--device`, `--privileged`, or udev rules)
+- This setup is intended for experienced amateur radio operators
+
+---
+
+## License
+
+SvxLink is licensed under the **GPL**.  
+This Docker setup follows the same spirit of openness and reuse.
+
+---
+
+## Author
+
+Docker setup maintained by **F4HLV**  
+Contributions and pull requests are welcome 🚀

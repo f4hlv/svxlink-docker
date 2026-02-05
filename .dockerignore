@@ -1,8 +1,49 @@
-!README.md
-*.md
-.cache
+data/
+logs/
+
+# VCS
 .git
 .gitignore
-LICENSE
-config
-svxlink
+
+# Build / compilation
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+*.o
+*.a
+*.so
+*.lo
+*.la
+
+# Logs & runtime
+*.log
+*.pid
+*.sock
+
+# Docs
+docs/
+doc/
+*.md
+*.rst
+
+# Archives
+*.tar
+*.tar.gz
+*.zip
+
+# IDE / éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
