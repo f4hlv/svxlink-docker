@@ -19,9 +19,11 @@ services:
       - START_SVXLINK=1
       - START_REMOTETRX=0
       - START_SVXREFLECTOR=0
+
       - SVXLINK_CONF=/etc/svxlink/svxlink.conf
       - REMOTETRX_CONF=/etc/svxlink/remotetrx.conf
       - SVXREFLECTOR_CONF=/etc/svxlink/svxreflector.conf
+      
       - SVXLINK_ARGS=
       - REMOTETRX_ARGS=
       - SVXREFLECTOR_ARGS=

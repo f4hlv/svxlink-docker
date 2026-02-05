@@ -1,6 +1,7 @@
 # svxlink directory
 /data/
 /logs/
+/svxlink.conf
 # /config/
 
 # IDE / editors

@@ -1,42 +1,76 @@
-FROM debian:trixie-slim
-
+# =========================================================
+# STAGE 1 — BUILD
+# =========================================================
+FROM debian:trixie-slim AS builder
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-    apt-get -y install --no-install-recommends \
-        git cmake g++ make doxygen groff curl sudo \
-        libsigc++-2.0-dev libgsm1-dev libpopt-dev tcl8.6-dev \
-        libgcrypt20-dev libspeex-dev libasound2-dev alsa-utils \
-        vorbis-tools qtbase5-dev qttools5-dev \
-        qttools5-dev-tools libopus-dev librtlsdr-dev \
-        libjsoncpp-dev libcurl4-openssl-dev libgpiod-dev \
-        libogg-dev ladspa-sdk libssl-dev \
-        ca-certificates openssl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get -y install --no-install-recommends \
+    git ca-certificates \
+    cmake g++ make dpkg-dev \
+    libsigc++-2.0-dev libgsm1-dev libpopt-dev tcl8.6-dev \
+    libgcrypt20-dev libspeex-dev libasound2-dev \
+    libopus-dev librtlsdr-dev libjsoncpp-dev \
+    libcurl4-openssl-dev libgpiod-dev libogg-dev \
+    ladspa-sdk libssl-dev \
+ && rm -rf /var/lib/apt/lists/*
 
-ENV GIT_URL=https://github.com/sm0svx/svxlink.git \
-    GIT_BRANCH=master \
-    NUM_CORES=4
+ARG GIT_URL=https://github.com/sm0svx/svxlink.git
+ARG GIT_BRANCH=master
+ARG NUM_CORES=4
 
-# Compilation de SVXLink
-COPY build-svxlink.sh /usr/local/bin/build-svxlink.sh
-RUN chmod +x /usr/local/bin/build-svxlink.sh
-
-# Crée un répertoire de build
 WORKDIR /build
-RUN /usr/local/bin/build-svxlink.sh
+RUN git clone --recursive --depth 1 --branch "${GIT_BRANCH}" "${GIT_URL}" svxlink
+WORKDIR /build/svxlink
 
-# Dossiers usuels
+# Build + .deb avec version lue dans src/versions (SVXSERVER=...)
+RUN set -eux; \
+    SVX_VER="$(awk -F= '$1=="SVXSERVER"{gsub(/[[:space:]]/,"",$2); print $2}' src/versions)"; \
+    echo "SVXSERVER version from src/versions: ${SVX_VER}"; \
+    rm -rf build && mkdir -p build && cd build; \
+    cmake \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+      -DCMAKE_INSTALL_SYSCONFDIR=/etc \
+      -DCMAKE_INSTALL_LOCALSTATEDIR=/var \
+      -DUSE_QT=OFF \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCPACK_GENERATOR=DEB \
+      -DCPACK_PACKAGE_VERSION="${SVX_VER}" \
+      -DCPACK_DEBIAN_PACKAGE_VERSION="${SVX_VER}" \
+      ../src; \
+    make -j"${NUM_CORES}"; \
+    make package; \
+    ls -lh *.deb
+
+# =========================================================
+# STAGE 2 — RUNTIME
+# =========================================================
+FROM debian:trixie-slim
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get -y install --no-install-recommends \
+    adduser init-system-helpers ca-certificates openssl \
+    libasyncaudio1.6t64 libasynccore1.6t64 libasynccpp1.6t64 libcurl3t64-gnutls \
+    libgcrypt20 libgsm1 libjsoncpp26 libpopt0 librtlsdr0 \
+    libsigc++-2.0-0v5 libtcl8.6 libgcc-s1 libstdc++6 \
+    libasound2 libgpiod3 libogg0 \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /build/svxlink/build/*.deb /tmp/svxlink.deb
+
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends /tmp/svxlink.deb && \
+    rm -f /tmp/svxlink.deb && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /etc/svxlink /var/log/svxlink /var/lib/svxlink && \
-    useradd -r -u 1000 -g audio -G audio,dialout -m -d /home/svx svx || true
+    useradd -r -u 1000 -m -d /home/svx svx || true
 
 ENV SVXLINK_CONF=/etc/svxlink/svxlink.conf \
-    SVXLINK_LOG=/var/log/svxlink \
-    SVXLINK_RUN_ARGS=""
+    REMOTETRX_CONF=/etc/svxlink/remotetrx.conf \
+    SVXREFLECTOR_CONF=/etc/svxlink/svxreflector.conf
 
-# Entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-# CMD ["svxlink"]
+# CMD ["svxlink", "-c", "/etc/svxlink/svxlink.conf"]
