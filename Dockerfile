@@ -49,7 +49,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get -y install --no-install-recommends \
     adduser init-system-helpers ca-certificates openssl \
-    libasyncaudio1.6t64 libasynccore1.6t64 libasynccpp1.6t64 libcurl3t64-gnutls \
+    libasyncaudio1.6t64 libasynccore1.6t64 libasynccpp1.6t64 libcurl4t64 \
     libgcrypt20 libgsm1 libjsoncpp26 libpopt0 librtlsdr0 \
     libsigc++-2.0-0v5 libtcl8.6 libgcc-s1 libstdc++6 \
     libasound2 libgpiod3 libogg0 \
