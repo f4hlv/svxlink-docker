@@ -151,6 +151,12 @@ REMOTETRX_CONF=/etc/svxlink/remotetrx.conf
 SVXREFLECTOR_CONF=/etc/svxlink/svxreflector.conf
 ```
 
+### Log file
+Example for svxlink
+```env
+SVXLINK_ARGS=--logfile=/var/log/svxlink/svxlink.log
+```
+
 ---
 
 ## Notes
